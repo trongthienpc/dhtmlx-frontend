@@ -59,6 +59,7 @@ export default class Gantt extends Component {
         return new Promise((resolve, reject) => {
           if (onDataUpdated) {
             onDataUpdated(type, action, item, id, parent);
+            // gantt.refreshData()
           }
 
           // if onDataUpdated changes returns a permanent id of the created item, you can return it from here so dhtmlxGantt could apply it
@@ -75,6 +76,22 @@ export default class Gantt extends Component {
 
   componentDidMount() {
     gantt.config.date_format = "%Y-%m-%d %H:%i";
+    gantt.config.scroll_size = 20
+    // gantt.config.layout = {
+    //   css: "gantt_container",
+    //   rows: [
+    //     {
+    //       cols: [
+    //         { view: "grid", group: "grids", scrollY: "scrollVer" },
+    //         { resizer: true, width: 3 },
+    //         { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
+    //         { view: "scrollbar", id: "scrollVer", group: "vertical" }
+    //       ],
+    //       gravity: 2
+    //     },
+    //     { view: "scrollbar", scroll: "x", id: "scrollHor", height: 20 }
+    //   ]
+    // };
 
     const { tasks } = this.props;
     gantt.init(this.ganttContainer);
