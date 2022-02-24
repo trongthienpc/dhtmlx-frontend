@@ -6,107 +6,88 @@ import moment from "moment";
 const App = () => {
   const refreshSource = () => {
     const dataJson = JSON.parse(localStorage.getItem("data"));
-    const data = {
+    const sources = {
       data: [],
       links: [],
     };
-    data.data = dataJson ? dataJson.data : [];
-    data.data.forEach((element) => {
+    sources.data = dataJson ? dataJson.data : [];
+    sources.data.forEach((element) => {
       const start_date = moment(element.start_date).format(
         "YYYY-MM-DD hh:mm:ss"
       );
       element.start_date = start_date;
     });
-    return data;
+    return sources;
   };
   const [sources, setSources] = useState(() => {
-    const data = refreshSource();
-    console.log("data", data);
-    return data;
+    const sources = refreshSource();
+    console.log("Sources: ===>", sources);
+    return sources;
   });
-  const getData = async () => {
-    //   localStorage.removeItem("data");
-    const api = await fetch("http://localhost:1337/data/")
-      .then((response) => {
-        return response.text();
-      })
-      .then((res) => {
-        localStorage.setItem("data", res);
-        setSources(() => {
-          return JSON.parse(res);
-        });
-        return res;
-      });
-    return api;
-  };
 
+  const [status, setStatus] = useState(false);
+  console.log("status: ", status);
   useEffect(() => {
+    console.log("call useEffect");
     const getData = async () => {
-      //   localStorage.removeItem("data");
       const api = await fetch("http://localhost:1337/data/")
         .then((response) => {
           return response.text();
         })
-        .then((res) => {
-          localStorage.setItem("data", res);
-          setSources(() => {
-            return JSON.parse(res);
-          });
-          return res;
+        .then((data) => {
+          localStorage.setItem("data", data);
+          return data;
         });
       return api;
     };
     getData();
-  }, []);
+  }, [status]);
 
-  console.log("++++++++++++++");
-  console.log(sources.data);
-
-  //   const currentZoom = "Days";
   const [currentZoom, setCurrentZoom] = useState("Days");
   const handleZoomChange = (zoom) => {
     setCurrentZoom(zoom);
   };
 
+  const deleteTask = async (id) => {
+    const options = {
+      method: "DELETE",
+    };
+    await fetch(`http://localhost:1337/data/task/${id}`, options);
+  };
+
+  const createTask = async (task) => {
+    const options = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(task),
+    };
+
+    await fetch("http://localhost:1337/data/task", options)
+      .then((response) => {
+        return response.text();
+      })
+      .then((data) => console.log(data));
+    setStatus(() => {
+      return !status;
+    });
+  };
+
   const logDataUpdate = async (type, action, item, id, parent) => {
     switch (action) {
       case "create":
-        console.log("create ======>");
-        console.log(item);
-        const createOptions = {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(item),
-        };
-        await fetch("http://localhost:1337/data/task", createOptions).then(
-          () => {
-            setSources((prev) => {
-              const newSource = getData();
-              return newSource;
-            });
-          }
-        );
+        console.log("create");
+        createTask(item);
 
         break;
+
       case "delete":
-        const deleteOptions = {
-          method: "DELETE",
-        };
-        await fetch(
-          `http://localhost:1337/data/task/${id}`,
-          deleteOptions
-        ).then(() => {
-          setSources(() => {
-            const newSource = getData();
-            return newSource;
-          });
-        });
+        console.log("delete");
+        deleteTask(id);
         break;
-
       default:
         break;
     }
