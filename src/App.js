@@ -2,8 +2,17 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import Gantt from "./components/Gantt";
 import Toolbar from "./components/Toolbar";
 import moment from "moment";
+import MessageArea from "./components/MessageArea/MessageArea";
+import { gantt } from "dhtmlx-gantt";
 
 const App = () => {
+  // messages
+  const [message, setMessage] = useState();
+  const [messages, setMessages] = useState([]);
+  const [entity, setEntity] = useState({});
+  const [parent, setParent] = useState("");
+  console.log(messages);
+
   const refreshSource = () => {
     const dataJson = JSON.parse(localStorage.getItem("data"));
     const sources = {
@@ -27,8 +36,8 @@ const App = () => {
 
   const [status, setStatus] = useState(false);
   const handleAction = () => {
-    setStatus(!status)
-  }
+    setStatus(!status);
+  };
 
   const updateLocal = async () => {
     const api = await fetch("http://localhost:1337/data/")
@@ -43,7 +52,7 @@ const App = () => {
 
   useEffect(() => {
     console.log("call useEffect");
-    localStorage.removeItem("data")
+    localStorage.removeItem("data");
     const getData = async () => {
       const api = await fetch("http://localhost:1337/data/")
         .then((response) => {
@@ -55,7 +64,7 @@ const App = () => {
       return api;
     };
     getData();
-  }, [status]);
+  }, []);
 
   console.log("status: ", status);
 
@@ -69,10 +78,11 @@ const App = () => {
       method: "DELETE",
     };
     await fetch(`http://localhost:1337/data/task/${id}`, options);
-    await updateLocal()
+    await updateLocal();
   };
 
   const createTask = async (task) => {
+    console.log(task);
     const options = {
       method: "POST",
       mode: "cors",
@@ -83,11 +93,47 @@ const App = () => {
       body: JSON.stringify(task),
     };
 
-    await fetch("http://localhost:1337/data/task", options)
+    await fetch("http://localhost:1337/data/task", options).then((response) => {
+      return response.text();
+    });
+    await updateLocal();
+  };
+
+  const updateTask = async (task, id) => {
+    const options = {
+      method: "PUT",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(task),
+    };
+
+    await fetch(`http://localhost:1337/data/task/${id}`, options).then(
+      (response) => {
+        return response.text();
+      }
+    );
+    await updateLocal();
+  };
+
+  const getTaskById = async (id) => {
+    const options = {
+      method: "GET",
+    };
+
+    const task = await fetch(`http://localhost:1337/data/task/${id}`, options)
       .then((response) => {
         return response.text();
       })
-    await updateLocal()
+      .then((data) => {
+        const dataJson = JSON.parse(data);
+        setEntity(() => {
+          return dataJson.tid;
+        });
+      });
+    return task;
   };
 
   const logDataUpdate = async (type, action, item, id, parent) => {
@@ -101,10 +147,63 @@ const App = () => {
         console.log("delete");
         deleteTask(id);
         break;
+      case "update":
+        console.log("update");
+        updateTask(item, id);
+        break;
       default:
         break;
     }
+
+    setMessages((prev) => {
+      let message = `${action} ${id}`;
+      return [...prev, message];
+    });
   };
+
+  // gantt.attachEvent("onTaskClick", function (id, e) {
+  //   //   // await getTaskById(id);
+  //   console.log("Task click ........");
+  //   return true;
+  // });
+  // gantt.attachEvent(
+  //   "onTaskClick",
+  //   function (id, e) {
+  //     console.log("onTaskClick");
+  //   },
+  //   { id: "ggg" }
+  // );
+
+  // gantt.attachEvent(
+  //   "onTaskRowClick",
+  //   function (id, row) {
+  //     console.log("onTaskClick", id);
+  //   },
+  //   { id: "r1" }
+  // );
+
+  gantt.attachEvent(
+    "onTaskSelected",
+    async function (id) {
+      const childrens = await fetch(
+        `http://localhost:1337/data/task/child/${id}`
+      )
+        .then((response) => {
+          return response.text();
+        })
+        .then((data) => {
+          const dataJson = JSON.parse(data);
+          return dataJson.tid;
+        });
+      console.log(childrens);
+      setMessages(() => {
+        return childrens;
+      });
+      return childrens;
+    },
+    { id: "banana" }
+  );
+
   return (
     <div>
       <div className="zoom-bar">
@@ -118,7 +217,7 @@ const App = () => {
         />
       </div>
       <div>
-        <button onClick={handleAction}>action</button>
+        <MessageArea messages={messages} />
       </div>
     </div>
   );

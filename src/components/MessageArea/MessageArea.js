@@ -1,24 +1,25 @@
-import React, { Component } from 'react';
+import React from "react";
+import moment from "moment";
 
-class MessageArea extends Component {
-    render() {
-        const messages = this.props.messages.map(({ message }) => {
-            return <li key={Math.random()}>{message}</li>
-        });
-
-        return (
-            <div className="message-area">
-                <h3>Messages:</h3>
-                <ul>
-                    {messages}
-                </ul>
-            </div>
-        );
-    }
-}
-
-MessageArea.defaultProps = {
-    messages: []
+const MessageArea = ({ messages }) => {
+  console.log(messages);
+  var total = 0;
+  if (messages) total = messages.length;
+  return (
+    <div>
+      <div className="message-area">
+        <h3>Customers: {total}</h3>
+        <ul>
+          {messages.map((message, index) => (
+            <li key={index}>
+              {message.text} - {moment(message.start_date).format("DD/MM/YYYY")}{" "}
+              - {message.duration} night(s)
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
 };
 
 export default MessageArea;
