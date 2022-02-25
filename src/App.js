@@ -4,7 +4,7 @@ import Toolbar from "./components/Toolbar";
 import moment from "moment";
 import MessageArea from "./components/MessageArea/MessageArea";
 import { gantt } from "dhtmlx-gantt";
-
+import { URL_API } from "./utilities/constants";
 const App = () => {
   // messages
   const [message, setMessage] = useState();
@@ -40,7 +40,7 @@ const App = () => {
   };
 
   const updateLocal = async () => {
-    const api = await fetch("http://localhost:1337/data/")
+    const api = await fetch(`${URL_API}/data`)
       .then((response) => {
         return response.text();
       })
@@ -54,7 +54,7 @@ const App = () => {
     console.log("call useEffect");
     localStorage.removeItem("data");
     const getData = async () => {
-      const api = await fetch("http://localhost:1337/data/")
+      const api = await fetch(`${URL_API}/data/`)
         .then((response) => {
           return response.text();
         })
@@ -104,7 +104,7 @@ const App = () => {
     const options = {
       method: "DELETE",
     };
-    await fetch(`http://localhost:1337/data/task/${id}`, options);
+    await fetch(`${URL_API}/data/task/${id}`, options);
     await updateLocal();
   };
 
@@ -120,7 +120,7 @@ const App = () => {
       body: JSON.stringify(task),
     };
 
-    await fetch("http://localhost:1337/data/task", options).then((response) => {
+    await fetch(`${URL_API}/data/task`, options).then((response) => {
       return response.text();
     });
     await updateLocal();
@@ -137,11 +137,9 @@ const App = () => {
       body: JSON.stringify(task),
     };
 
-    await fetch(`http://localhost:1337/data/task/${id}`, options).then(
-      (response) => {
-        return response.text();
-      }
-    );
+    await fetch(`${URL_API}/data/task/${id}`, options).then((response) => {
+      return response.text();
+    });
     await updateLocal();
   };
 
@@ -150,7 +148,7 @@ const App = () => {
       method: "GET",
     };
 
-    const task = await fetch(`http://localhost:1337/data/task/${id}`, options)
+    const task = await fetch(`${URL_API}/data/task/${id}`, options)
       .then((response) => {
         return response.text();
       })
@@ -212,9 +210,7 @@ const App = () => {
   gantt.attachEvent(
     "onTaskSelected",
     async function (id) {
-      const childrens = await fetch(
-        `http://localhost:1337/data/task/child/${id}`
-      )
+      const childrens = await fetch(`${URL_API}/data/task/child/${id}`)
         .then((response) => {
           return response.text();
         })
