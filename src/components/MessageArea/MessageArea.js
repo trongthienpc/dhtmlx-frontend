@@ -2,7 +2,6 @@ import React from "react";
 import moment from "moment";
 
 const MessageArea = ({ messages }) => {
-  console.log(messages);
   var total = 0;
   if (messages) total = messages.length;
   return (

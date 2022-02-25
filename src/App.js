@@ -11,7 +11,6 @@ const App = () => {
   const [messages, setMessages] = useState([]);
   const [entity, setEntity] = useState({});
   const [parent, setParent] = useState("");
-  console.log(messages);
 
   const refreshSource = () => {
     const dataJson = JSON.parse(localStorage.getItem("data"));
@@ -30,7 +29,6 @@ const App = () => {
   };
   const [sources, setSources] = useState(() => {
     const sources = refreshSource();
-    console.log("Sources: ===>", sources);
     return sources;
   });
 
@@ -51,7 +49,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    console.log("call useEffect");
     localStorage.removeItem("data");
     const getData = async () => {
       const api = await fetch(`${URL_API}/data/`)
@@ -92,8 +89,6 @@ const App = () => {
   //     [e.target.name]: e.target.value,
   //   });
   // };
-
-  console.log("status: ", status);
 
   const [currentZoom, setCurrentZoom] = useState("Days");
   const handleZoomChange = (zoom) => {

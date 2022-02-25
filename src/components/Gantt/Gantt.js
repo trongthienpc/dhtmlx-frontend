@@ -66,23 +66,8 @@ export default class Gantt extends Component {
 
   componentDidMount() {
     gantt.config.date_format = "%Y-%m-%d %H:%i";
-
     gantt.config.scroll_size = 20;
-    // gantt.config.layout = {
-    //   css: "gantt_container",
-    //   rows: [
-    //     {
-    //       cols: [
-    //         { view: "grid", group: "grids", scrollY: "scrollVer" },
-    //         { resizer: true, width: 3 },
-    //         { view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer" },
-    //         { view: "scrollbar", id: "scrollVer", group: "vertical" }
-    //       ],
-    //       gravity: 2
-    //     },
-    //     { view: "scrollbar", scroll: "x", id: "scrollHor", height: 20 }
-    //   ]
-    // };
+
     gantt.templates.grid_row_class = function (start, end, task) {
       if (task.$level >= 1) {
         return "nested_task";
@@ -111,17 +96,17 @@ export default class Gantt extends Component {
     ];
 
     gantt.config.columns = [
-      { name: "add", label: "", width: 50, align: "left" },
       {
         name: "text",
         label:
-          "<div class='searchEl'>Task name <input id='search' type='text'" +
+          "<div class='searchEl'><input id='search' type='text'" +
           "oninput='gantt.change_detector()' placeholder='Search tasks...'> </div>",
         width: 250,
         tree: true,
       },
       { name: "start_date", label: "Start time", align: "center" },
       { name: "duration", label: "Duration", align: "center" },
+      { name: "add", label: "", width: 50, align: "left" },
     ];
 
     gantt.config.open_tree_initially = true;
@@ -145,14 +130,10 @@ export default class Gantt extends Component {
       var match = false;
       // check children's text
       if (gantt.hasChild(id)) {
-        console.log("id", id);
         gantt.eachTask(function (child_object) {
           if (compare_input(child_object.id, filter_data)) {
             match = true;
-            console.log("child_object", child_object.id);
-            console.log("filter_data", filter_data);
           }
-          console.log("match", match);
         }, id);
       }
 
