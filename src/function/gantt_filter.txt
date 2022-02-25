@@ -1,0 +1,94 @@
+// way 1
+      // Search bar + functionality
+    var textFilter = "<input id='search' placeholder='Search...' type='text' oninput='gantt.$doFilter(this.value)'>";
+    var filterValue = "";
+    var delay;
+    gantt.$doFilter = function (value) {
+      filterValue = value
+      clearTimeout(delay);
+      delay = setTimeout(function () {
+        gantt.render();
+        gantt.$root.querySelector("#search").focus();
+      }, 200);
+    };
+    gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
+      if (!filterValue) return true;
+      var normalizedText = task.text.toLowerCase();
+      var normalizedValue = filterValue.toLowerCase();
+      return normalizedText.indexOf(normalizedValue) > -1;
+    });
+    gantt.attachEvent("onGanttRender", function () {
+      gantt.$root.querySelector("#search").value = filterValue;
+    });
+    // End of search bar + functionality
+
+gantt.config.columns = [
+      { name: "add", label: "", width: 50, align: "left" },
+      // {
+      //   name: "text",
+      //   label:
+      //     "<div class='searchEl'>Task name <input id='search' type='text'" +
+      //     "placeholder='Search tasks...'></div>",
+      //   width: 250,
+      //   tree: true,
+      // },
+      // other columns
+      {
+        name: "text",
+        label: textFilter,
+        tree: true,
+        min_width: 200,
+        max_width: 300,
+      },
+    ];
+
+
+
+// way 2
+// var filter_data;
+    // var search_box = document.getElementById("search");
+    // gantt.attachEvent("onDataRender", function () {
+    //   search_box = document.getElementById("search");
+    // });
+
+    // search_box.oninput = function change_detector() {
+    //   filter_data = search_box.value;
+    //   gantt.refreshData();
+    // };
+
+    // // search_box.oninput = function () {
+    // //   filter_data = search_box.value;
+    // //   gantt.refreshData();
+    // // };
+
+    // function compare_input(id) {
+    //   var match = false;
+    //   // check children's text
+    //   if (gantt.hasChild(id)) {
+    //     gantt.eachTask(function (child_object) {
+    //       if (compare_input(child_object.id, filter_data)) match = true;
+    //     }, id);
+    //   }
+
+    //   // check task's text
+    //   // if (!filter_data) return (match = true);
+    //   if (
+    //     gantt
+    //       .getTask(id)
+    //       .text.toLowerCase()
+    //       .indexOf(filter_data.toLowerCase() ?? "") >= 0
+    //   )
+    //     match = true;
+
+    //   return match;
+    // }
+
+    // gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
+    //   if (compare_input(id)) {
+    //     return true;
+    //   }
+
+    //   return false;
+    // });
+
+    // change_detector();

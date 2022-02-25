@@ -66,6 +66,33 @@ const App = () => {
     getData();
   }, []);
 
+  const [filter, setFiler] = useState("henry");
+
+  // useEffect(() => {
+  //   const onBeforeTaskDisplay = gantt.attachEvent(
+  //     "onBeforeTaskDisplay",
+  //     function (id, task) {
+  //       console.log("filters", task.text, filter);
+  //       if (filter === task.text) {
+  //         return false;
+  //       }
+  //       return true;
+  //     }
+  //   );
+  //   gantt.refreshData();
+  //   gantt.render();
+
+  //   // This should have been here
+  //   return () => {
+  //     gantt.detachEvent(onBeforeTaskDisplay);
+  //   };
+  // }, [filter]);
+  // const handleChange = (e) => {
+  //   setFiler({
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
+
   console.log("status: ", status);
 
   const [currentZoom, setCurrentZoom] = useState("Days");
@@ -203,6 +230,10 @@ const App = () => {
     },
     { id: "banana" }
   );
+
+  function change_detector() {
+    console.log("call mee ------");
+  }
 
   return (
     <div>
