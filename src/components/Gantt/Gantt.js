@@ -90,21 +90,6 @@ export default class Gantt extends Component {
       return "";
     };
 
-    // gantt.config.columns = [
-    //   {
-    //     name: "text",
-    //     label:
-    //       "<input id='search' type='field' oninput=change_detector() style='width:150px' />",
-    //     tree: true,
-    //     min_width: 200,
-    //     max_width: 300,
-    //   },
-    //   { name: "start_date", label: "Start time", align: "center", width: 120 },
-    //   { name: "duration", label: "Duration", align: "center", width: 120 },
-    //   { name: "add", label: "+", align: "center", width: 50 },
-    // ];
-
-    // gantt.locale.labels.section_priority = "Priority";
     gantt.locale.labels.section_phone = "Phone/Email";
     gantt.locale.labels.section_description = "Name";
     gantt.config.lightbox.sections = [
@@ -115,17 +100,7 @@ export default class Gantt extends Component {
         type: "textarea",
         focus: true,
       },
-      // {
-      //   name: "status",
-      //   height: 22,
-      //   map_to: "status",
-      //   type: "select",
-      //   options: [
-      //     { key: 1, label: "New" },
-      //     { key: 2, label: "Open" },
-      //     { key: 3, label: "Done" },
-      //   ],
-      // },
+
       {
         name: "phone",
         map_to: "phone",
@@ -135,36 +110,6 @@ export default class Gantt extends Component {
       { name: "time", height: 72, type: "duration", map_to: "auto" },
     ];
 
-    // Search bar + functionality
-    // var textFilter =
-    //   "<input id='search' placeholder='Search...' type='text' oninput='gantt.$doFilter(this.value)'>";
-    // var filterValue = "";
-    // var delay;
-    // gantt.$doFilter = function (value) {
-    //   filterValue = value;
-    //   clearTimeout(delay);
-    //   delay = setTimeout(function () {
-    //     gantt.render();
-    //     gantt.$root.querySelector("#search").focus();
-    //   }, 200);
-    // };
-    // gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
-    //   if (!filterValue) return true;
-    //   var normalizedText = task.text.toLowerCase();
-    //   var normalizedValue = filterValue.toLowerCase();
-    //   return normalizedText.indexOf(normalizedValue) > -1;
-    // });
-    // gantt.attachEvent("onGanttRender", function () {
-    //   gantt.$root.querySelector("#search").value = filterValue;
-    // });
-    // End of search bar + functionality
-
-    // Tree header (columns)
-    // gantt.config.columns = [
-    //   { name: "text", label: textFilter, tree: true, resize: true },
-    //   { name: "start_date", label: "Start time", align: "center" },
-    //   { name: "duration", label: "Duration", align: "center" },
-    // ];
     gantt.config.columns = [
       { name: "add", label: "", width: 50, align: "left" },
       {
@@ -175,14 +120,8 @@ export default class Gantt extends Component {
         width: 250,
         tree: true,
       },
-      // other columns
-      // {
-      //   name: "text",
-      //   label: textFilter,
-      //   tree: true,
-      //   min_width: 200,
-      //   max_width: 300,
-      // },
+      { name: "start_date", label: "Start time", align: "center" },
+      { name: "duration", label: "Duration", align: "center" },
     ];
 
     gantt.config.open_tree_initially = true;
@@ -191,41 +130,11 @@ export default class Gantt extends Component {
     this.initGanttDataProcessor();
     gantt.parse(tasks);
 
-    // var inputEl = document.getElementById("search");
-
-    // inputEl.oninput = function () {
-    //   gantt.refreshData();
-    // };
-
-    // function hasSubstr(parentId) {
-    //   var task = gantt.getTask(parentId);
-    //   if (task.text.toLowerCase().indexOf(inputEl.value.toLowerCase()) !== -1)
-    //     return true;
-
-    //   var child = gantt.getChildren(parentId);
-    //   for (var i = 0; i < child.length; i++) {
-    //     if (hasSubstr(child[i])) return true;
-    //   }
-    //   return false;
-    // }
-
-    // gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
-    //   if (hasSubstr(id)) return true;
-
-    //   return false;
-    // });
-
     var filter_data = "";
     var search_box = document.getElementById("search");
     gantt.attachEvent("onDataRender", function () {
       search_box = document.getElementById("search");
     });
-
-    // search_box.oninput = function change_detector() {
-    //   console.log("filter_data", filter_data);
-    //   filter_data = search_box.value;
-    //   gantt.refreshData();
-    // };
 
     gantt.change_detector = function change_detector() {
       filter_data = search_box.value;
@@ -248,8 +157,6 @@ export default class Gantt extends Component {
       }
 
       // check task's text
-      // if (!filter_data) return (match = true);
-
       if (
         gantt
           .getTask(id)
@@ -257,7 +164,6 @@ export default class Gantt extends Component {
           .indexOf(filter_data.toLowerCase()) >= 0
       )
         match = true;
-
       return match;
     }
 
@@ -265,7 +171,6 @@ export default class Gantt extends Component {
       if (compare_input(id)) {
         return true;
       }
-
       return false;
     });
 
