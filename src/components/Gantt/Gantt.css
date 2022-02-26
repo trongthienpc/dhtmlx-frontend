@@ -5,3 +5,13 @@
 .nested_task .gantt_add {
   display: none !important;
 }
+.weekend {
+  background: #f4f7f4 !important;
+}
+/* low */
+.gantt_task_line.parent {
+  background-color: #6ba8e3;
+}
+.gantt_task_line.parent .gantt_task_content {
+  color: #fff;
+}

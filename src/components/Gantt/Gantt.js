@@ -92,19 +92,30 @@ export default class Gantt extends Component {
         type: "textarea",
         height: 23,
       },
-      { name: "time", height: 72, type: "duration", map_to: "auto" },
+      // { name: "time", height: 72, type: "duration", map_to: "auto" },
+      {
+        name: "time",
+        type: "duration",
+        map_to: "auto",
+      },
     ];
 
     gantt.config.columns = [
       {
         name: "text",
         label:
-          "<div class='searchEl'><input id='search' type='text'" +
+          "<div class='searchEl'>Name <input id='search' type='text'" +
           "oninput='gantt.change_detector()' placeholder='Search tasks...'> </div>",
-        width: 250,
+        width: 200,
         tree: true,
+        resize: true,
       },
-      { name: "start_date", label: "Start time", align: "center" },
+      {
+        name: "start_date",
+        label: "Start time",
+        align: "center",
+        format: "dd-mm-YY",
+      },
       { name: "duration", label: "Duration", align: "center" },
       { name: "add", label: "", width: 50, align: "left" },
     ];
@@ -113,13 +124,50 @@ export default class Gantt extends Component {
       return gantt.date.date_to_str(gantt.config.time_picker)(date);
     };
 
+    // Highlighting weekends
+    // gantt.config.work_time = true;
+
+    // gantt.templates.scale_cell_class = function (date) {
+    //   if (!gantt.isWorkTime(date)) {
+    //     return "weekend";
+    //   }
+    // };
+    // gantt.templates.timeline_cell_class = function (task, date) {
+    //   if (!gantt.isWorkTime({ task: task, date: date })) {
+    //     return "weekend";
+    //   }
+    // };
+    gantt.templates.scale_cell_class = function (date) {
+      if (date.getDay() === 0 || date.getDay() === 6) {
+        return "weekend";
+      }
+    };
+    gantt.templates.timeline_cell_class = function (task, date) {
+      if (date.getDay() === 0 || date.getDay() === 6) {
+        return "weekend";
+      }
+    };
+
+    gantt.templates.task_class = function (start, end, task) {
+      if (task.parent == 0) return "parent";
+    };
+
     gantt.config.open_tree_initially = true;
     const { tasks } = this.props;
     gantt.config.fit_tasks = true;
+    gantt.plugins({
+      tooltip: true,
+    });
+    gantt.templates.grid_date_format = function (date) {
+      return gantt.date.date_to_str("%m-%d-%Y")(date);
+    };
     gantt.init(this.ganttContainer, new Date());
     this.initGanttDataProcessor();
     gantt.parse(tasks);
     gantt.showDate(new Date());
+    gantt.templates.tooltip_text = function (start, end, task) {
+      return `<b>Name:</b>  ${task.text}  <br/><b>Phone:</b> ${task.phone}<br/><b>Duration:</b>   ${task.duration}`;
+    };
 
     var filter_data = "";
     var search_box = document.getElementById("search");
@@ -159,6 +207,11 @@ export default class Gantt extends Component {
         return true;
       }
       return false;
+    });
+
+    gantt.attachEvent("onTaskCreated", function (task) {
+      task.start_date = new Date();
+      return true;
     });
 
     gantt.change_detector();

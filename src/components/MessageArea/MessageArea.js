@@ -31,7 +31,7 @@ const MessageArea = ({ messages, books }) => {
                 {books.map((book, index) => (
                   <li key={index}>
                     {book.text} - {moment(book.start_date).format("DD/MM/YYYY")}{" "}
-                    - {book.duration} night(s)
+                    - {book.phone} - {book.duration} night(s)
                   </li>
                 ))}
               </ul>
