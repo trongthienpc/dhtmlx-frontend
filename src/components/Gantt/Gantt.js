@@ -109,11 +109,17 @@ export default class Gantt extends Component {
       { name: "add", label: "", width: 50, align: "left" },
     ];
 
+    gantt.templates.time_picker = function (date) {
+      return gantt.date.date_to_str(gantt.config.time_picker)(date);
+    };
+
     gantt.config.open_tree_initially = true;
     const { tasks } = this.props;
-    gantt.init(this.ganttContainer);
+    gantt.config.fit_tasks = true;
+    gantt.init(this.ganttContainer, new Date());
     this.initGanttDataProcessor();
     gantt.parse(tasks);
+    gantt.showDate(new Date());
 
     var filter_data = "";
     var search_box = document.getElementById("search");

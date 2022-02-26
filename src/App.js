@@ -9,9 +9,31 @@ const App = () => {
   // messages
   const [message, setMessage] = useState();
   const [messages, setMessages] = useState([]);
+  const [books, setBooks] = useState([]);
   const [entity, setEntity] = useState({});
   const [parent, setParent] = useState("");
 
+  var count = 0;
+  // gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
+  //   if (gantt.hasChild(id)) {
+  //     gantt.eachTask(function (child_object) {
+  //       const m = new Date(child_object.start_date);
+
+  //       const today = new Date();
+  //       const nextDays = new Date();
+  //       nextDays.setDate(nextDays.getDate() + 7);
+  //       if (m > today && m < nextDays)
+  //         // count = count + 1;
+  //         setBooks((prev) => {
+  //           const newBooks = [...prev, child_object];
+  //           return newBooks;
+  //         });
+  //     }, id);
+  //   }
+
+  //   return true;
+  // });
+  console.log(count);
   const refreshSource = () => {
     const dataJson = JSON.parse(localStorage.getItem("data"));
     const sources = {
@@ -19,12 +41,23 @@ const App = () => {
       links: [],
     };
     sources.data = dataJson ? dataJson.data : [];
+    const today = new Date();
+    const nextDays = new Date();
+    nextDays.setDate(nextDays.getDate() + 7);
     sources.data.forEach((element) => {
       const start_date = moment(element.start_date).format(
         "YYYY-MM-DD hh:mm:ss"
       );
       element.start_date = start_date;
+      const e = new Date(element.start_date);
+      if (e.getTime() > today.getTime() && e.getTime() < nextDays.getTime()) {
+        setBooks((prev) => {
+          const newBooks = [...prev, element];
+          return newBooks;
+        });
+      }
     });
+
     return sources;
   };
   const [sources, setSources] = useState(() => {
@@ -63,8 +96,6 @@ const App = () => {
     getData();
   }, []);
 
-  const [filter, setFiler] = useState("henry");
-
   // useEffect(() => {
   //   const onBeforeTaskDisplay = gantt.attachEvent(
   //     "onBeforeTaskDisplay",
@@ -100,6 +131,7 @@ const App = () => {
       method: "DELETE",
     };
     await fetch(`${URL_API}/data/task/${id}`, options);
+    localStorage.removeItem("data");
     await updateLocal();
   };
 
@@ -175,10 +207,10 @@ const App = () => {
         break;
     }
 
-    setMessages((prev) => {
-      let message = `${action} ${id}`;
-      return [...prev, message];
-    });
+    // setMessages((prev) => {
+    //   let message = `${action} ${id}`;
+    //   return [...prev, message];
+    // });
   };
 
   // gantt.attachEvent("onTaskClick", function (id, e) {
@@ -213,7 +245,6 @@ const App = () => {
           const dataJson = JSON.parse(data);
           return dataJson.tid;
         });
-      console.log(childrens);
       setMessages(() => {
         return childrens;
       });
@@ -222,9 +253,39 @@ const App = () => {
     { id: "banana" }
   );
 
-  function change_detector() {
-    console.log("call mee ------");
-  }
+  gantt.attachEvent(
+    "onAfterTaskAdd",
+    function (id, item) {
+      const today = new Date();
+      const nextDays = new Date();
+      nextDays.setDate(nextDays.getDate() + 7);
+      const e = new Date(item.start_date);
+      if (e.getTime() > today.getTime() && e.getTime() < nextDays.getTime()) {
+        setBooks((prev) => {
+          const newBooks = [...prev, item];
+          return newBooks;
+        });
+      }
+    },
+    { id: "mango" }
+  );
+
+  gantt.attachEvent(
+    "onAfterTaskUpdate",
+    function (id, item) {
+      const today = new Date();
+      const nextDays = new Date();
+      nextDays.setDate(nextDays.getDate() + 7);
+      const e = new Date(item.start_date);
+      if (e.getTime() > today.getTime() && e.getTime() < nextDays.getTime()) {
+        setBooks((prev) => {
+          const newBooks = [...prev, item];
+          return newBooks;
+        });
+      }
+    },
+    { id: "blue" }
+  );
 
   return (
     <div>
@@ -239,7 +300,7 @@ const App = () => {
         />
       </div>
       <div>
-        <MessageArea messages={messages} />
+        <MessageArea messages={messages} books={books} />
       </div>
     </div>
   );
